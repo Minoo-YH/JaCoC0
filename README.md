@@ -35,3 +35,26 @@ I ran the tests using:
 
 ```bash
 mvn clean test
+```
+
+The JaCoCo HTML report is generated in:
+
+```text
+target/site/jacoco/index.html
+```
+
+The report shows line coverage, branch coverage, method coverage, and class coverage.
+
+## Test Result
+
+Here is the screenshot of my test results:
+
+![Test Results](test.png)
+
+## What I learned
+
+From this assignment, I learned how to write unit tests with JUnit 5 and how to use `assertEquals`, `assertTrue`, and `assertFalse`.
+
+I also learned why testing boundary values is important. For example, -40°C and 50°C are not extreme temperatures in my program, but values below -40°C or above 50°C are.
+
+I also learned how to use JaCoCo with Maven to check which parts of my code are covered by my tests.
