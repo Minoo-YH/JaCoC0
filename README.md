@@ -2,17 +2,48 @@
 
 This project is part of my in-class assignment about unit testing and code coverage in Java.
 
-The main goal was to create a simple temperature converter, write tests for it using JUnit 5, and then use JaCoCo to check the code coverage.
+The goal was to create a simple temperature converter, write unit tests using JUnit 5, check the code coverage with JaCoCo, and run the project in Jenkins.
 
 ## What I implemented
 
-The `TemperatureConverter` class has three methods:
+The `TemperatureConverter` class has four methods:
 
 - `fahrenheitToCelsius()` converts Fahrenheit to Celsius.
 - `celsiusToFahrenheit()` converts Celsius to Fahrenheit.
+- `kelvinToCelsius()` converts Kelvin to Celsius.
 - `isExtremeTemperature()` checks if a Celsius temperature is below -40°C or above 50°C.
 
+For Kelvin to Celsius, I used:
+
+C = K - 273.15
+
+For example, 300 K is 26.85°C.
+
 ## Testing
+
+I used JUnit 5 to test the temperature conversion methods and the extreme temperature check.
+
+All 4 tests passed successfully.
+
+## Code Coverage
+
+I used JaCoCo to check the code coverage.
+
+The final coverage report shows 100% coverage for instructions, branches, lines, and methods.
+
+![Coverage Report](Coverage_report.png)
+
+## Jenkins
+
+I created a Jenkins Freestyle project called `Minoo_Temperature_V1`.
+
+Jenkins gets the project from GitHub and runs the Maven tests with:
+
+`clean verify`
+
+The Jenkins build and tests completed successfully.
+
+![Jenkins Test Result](Jenkin_test_result.png)
 
 I created `TemperatureConverterTest` using JUnit 5.
 
