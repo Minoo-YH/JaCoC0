@@ -1,0 +1,52 @@
+pipeline {
+
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                bat 'mvn clean install'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Testing...'
+                // Add test steps here
+                 bat 'mvn test'
+            }
+        }
+
+        stage('code Coverage') {
+            steps {
+                echo 'Calculating code coverage...'
+                // Add code coverage steps here
+                bat 'mvn jacoco:report'
+            }
+        }
+
+        stage('Publish Test Results') {
+            steps {
+                echo 'Publishing test results...'
+                // Add steps to publish test results here
+                // be jenkin mige natijeharo bekhon v dakhele jenkin namayesh bede
+                junit '**/target/surefire-reports/*.xml'
+            }
+        }
+
+        stage('Publish Coverage Results') {
+            steps {
+                echo 'Publishing coverage results...'
+                // Add steps to publish coverage results here
+                jacoco execPattern: '**/target/jacoco.exec', classPattern: '**/target/classes', sourcePattern: '**/src/main/java', exclusionPattern: '**/target/**'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying...'
+                // Add deployment steps here
+            }
+        }
+    }
+}
