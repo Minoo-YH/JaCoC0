@@ -50,5 +50,18 @@ pipeline {
         bat 'docker build -t minooyh/tempconverter:latest .'
     }
 }
+stage('Docker Push') {
+    steps {
+        // Login be Docker Hub va push kardane image
+        withCredentials([usernamePassword(
+            credentialsId: 'dockerhub-credentials',
+            usernameVariable: 'DOCKER_USERNAME',
+            passwordVariable: 'DOCKER_TOKEN'
+        )]) {
+            bat 'echo %DOCKER_TOKEN% | docker login -u %DOCKER_USERNAME% --password-stdin'
+            bat 'docker push minooyh/tempconverter:latest'
+        }
+    }
+}
     }
 }
