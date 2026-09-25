@@ -44,11 +44,11 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                // Docker Hub deployment dar marhale baad ezafe mishavad
-                echo 'Deploying...'
-            }
-        }
+       stage('Docker Build') {
+    steps {
+        // Sakhtane Docker image
+        bat 'docker build -t minooyh/tempconverter:latest .'
+    }
+}
     }
 }
