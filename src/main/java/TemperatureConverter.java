@@ -15,4 +15,15 @@ public class TemperatureConverter {
         return kelvin -273.15;
     }
 
+    public static void main(String[] args) {
+    // Sakhtane yek object az TemperatureConverter
+    TemperatureConverter converter = new TemperatureConverter();
+
+    // Tabdile 100 Celsius be Fahrenheit
+    double result = converter.celsiusToFahrenheit(100);
+
+    // Namayeshe natije
+    System.out.println("100 Celsius = " + result + " Fahrenheit");
+}
+
 }
