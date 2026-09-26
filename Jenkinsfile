@@ -58,10 +58,12 @@ stage('Docker Push') {
             usernameVariable: 'DOCKER_USERNAME',
             passwordVariable: 'DOCKER_TOKEN'
         )]) {
-            bat 'echo %DOCKER_TOKEN% | docker login -u %DOCKER_USERNAME% --password-stdin'
-            bat 'docker push minooyh/tempconverter:latest'
+            bat '''
+            @echo off
+            echo %DOCKER_TOKEN%| docker login -u %DOCKER_USERNAME% --password-stdin
+            docker push minooyh/tempconverter:latest
+            '''
         }
     }
 }
-    }
 }
