@@ -1,9 +1,22 @@
-# Estefade az Java 17 baraye ejraye application
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:17-jdk
 
-# Sakhtane working directory dakhele container
+RUN apt-get update && \
+    apt-get install -y \
+    maven \
+    libgtk-3-0 \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    libxtst6 \
+    libxi6 \
+    libgl1 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-# Copy kardane JAR file dakhele container
-COPY target/tempConverter-1.0-SNAPSHOT.jar app.jar
-# Ejraye application vaghti container start mishe
-CMD ["java", "-jar", "app.jar"]
+
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+COPY src ./src
+
+CMD ["mvn", "javafx:run"]
