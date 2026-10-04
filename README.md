@@ -141,3 +141,87 @@ I also learned why testing boundary values is important. For example, -40°C and
 I learned how to use JaCoCo with Maven to check which parts of my code are covered by my tests.
 
 I also learned how to create a Jenkins pipeline using a Jenkinsfile, build a Docker image, run the image, and push it to Docker Hub.
+
+---
+
+# Assignment 6 - JavaFX, Database and Docker
+
+For this assignment, I continued working on my Temperature Converter project. I changed the console project into a JavaFX application and added an SQLite database. I also added more unit tests and ran the JavaFX application from Docker using Xming.
+
+## JavaFX Temperature Converter
+
+I created a simple JavaFX interface for the Temperature Converter. The user can enter a Celsius value, click the convert button, and see the result in Fahrenheit.
+
+For example, I tested 25 Celsius and the result was 77 Fahrenheit.
+
+## Database
+
+I used SQLite for the database and created two related tables:
+
+- `temperature_unit`
+- `temperature_record`
+
+The tables are connected with a foreign key. I used `DBConnection` for the database connection and initialization, and `TempRecordDAO` to save the conversion records.
+
+When I make a conversion in the JavaFX application, the conversion can be saved in the database.
+
+![Database Connection](DatabaseConect.png)
+
+## Unit Tests
+
+I kept my previous unit tests and added new tests for the database classes:
+
+- `DBConnectionTest`
+- `TempRecordDAOTest`
+
+The project now has 7 tests in total and all 7 tests pass.
+
+![7 Tests Passed](7test.png)
+
+## JaCoCo Code Coverage
+
+I used JaCoCo again after adding the new JavaFX and database classes.
+
+The latest report shows 38% instruction coverage and 66% branch coverage.
+
+![JaCoCo Coverage](coverage_new.png)
+
+## Docker and Xming
+
+I updated the Dockerfile for the JavaFX application and built the Docker image with:
+
+```bash
+docker build -t minooyh/tempconverter:latest .
+```
+
+I installed Xming on Windows to use it as the X server. Then I ran the JavaFX application from the Docker container with:
+
+```bash
+docker run --rm -e DISPLAY=host.docker.internal:0.0 minooyh/tempconverter:latest
+```
+
+The Temperature Converter opened successfully through Xming. I tested it with 25 Celsius and got 77 Fahrenheit.
+
+![Temperature Converter with Xming](XmingConvertor.png)
+
+## Docker Hub
+
+After testing the final Docker image, I pushed it to Docker Hub.
+
+The image is:
+
+```text
+minooyh/tempconverter:latest
+```
+
+I pushed it using:
+
+```bash
+docker push minooyh/tempconverter:latest
+```
+
+## What I learned from this part
+
+In this assignment, I learned how to make a basic JavaFX GUI and connect a Java application to an SQLite database. I also learned how to save data with a DAO class and add unit tests for database code.
+
+I also learned how to run a JavaFX application inside a Docker container and display the GUI on Windows using Xming.
