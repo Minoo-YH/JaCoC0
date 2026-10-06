@@ -9,6 +9,8 @@ public class TemperatureApp extends Application {
 
     @Override
     public void start(Stage stage) {
+        DBConnection.initializeDatabase();
+
         TextField input = new TextField();
         input.setPromptText("Enter Celsius");
 
