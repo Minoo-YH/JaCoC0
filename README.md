@@ -232,3 +232,12 @@ I also learned how to run a JavaFX application inside a Docker container and dis
 The `TemperatureConverter` class achieved 100% instruction and branch coverage with JaCoCo.
 
 ![JaCoCo TemperatureConverter 100% Coverage](jacoco_temperature_converter_100.png)
+
+
+## Localization
+
+The application supports English, Finnish, Swedish, and Japanese.
+
+Example of the application running in Japanese:
+
+![Japanese Localization](japanesTra.png)
