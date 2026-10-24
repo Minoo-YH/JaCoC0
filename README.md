@@ -225,3 +225,10 @@ docker push minooyh/tempconverter:latest
 In this assignment, I learned how to make a basic JavaFX GUI and connect a Java application to an SQLite database. I also learned how to save data with a DAO class and add unit tests for database code.
 
 I also learned how to run a JavaFX application inside a Docker container and display the GUI on Windows using Xming.
+
+
+## JaCoCo Code Coverage
+
+The `TemperatureConverter` class achieved 100% instruction and branch coverage with JaCoCo.
+
+![JaCoCo TemperatureConverter 100% Coverage](jacoco_temperature_converter_100.png)
