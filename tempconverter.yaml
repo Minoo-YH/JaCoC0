@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempconverter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tempconverter
+  template:
+    metadata:
+      labels:
+        app: tempconverter
+    spec:
+      containers:
+        - name: tempconverter
+          image: minooyh/tempconverter:latest
+          imagePullPolicy: Always
+          command: ["sh", "-c", "echo Temperature Converter deployed successfully; sleep infinity"]

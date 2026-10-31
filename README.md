@@ -280,3 +280,23 @@ All 8 tests pass successfully with Maven.
 Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
+
+## Kubernetes Deployment
+
+I created a Kubernetes deployment file named `tempconverter.yaml` and tested it locally with Minikube using the Docker driver.
+
+The deployment uses the Docker image `minooyh/tempconverter:latest`.
+
+The Kubernetes pod started successfully with status `Running` and the pod log showed:
+
+```text
+Temperature Converter deployed successfully
+```
+
+### Jenkins CI/CD
+
+The Jenkins pipeline successfully built and tested the project, generated JaCoCo coverage, built the Docker image, and pushed it to Docker Hub.
+
+![Jenkins Pipeline](minoo_template_pipline.png)
+
+![Assignment 6 Pipeline Build](pipline_build_task6.png)
