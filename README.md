@@ -229,7 +229,7 @@ I also learned how to run a JavaFX application inside a Docker container and dis
 
 ## JaCoCo Code Coverage
 
-The `TemperatureConverter` class achieved 100% instruction and branch coverage with JaCoCo.
+The `TemperatureConverter` class chieved 100% instruction and branch coverage with JaCoCo.
 
 ![JaCoCo TemperatureConverter 100% Coverage](jacoco_temperature_converter_100.png)
 
@@ -241,3 +241,42 @@ The application supports English, Finnish, Swedish, and Japanese.
 Example of the application running in Japanese:
 
 ![Japanese Localization](japanesTra.png)
+
+## Assignment 6 - Localization Update
+
+For this assignment, I extended the JavaFX Temperature Converter with localization and unit selection.
+
+The application now supports five languages: English, Finnish, Swedish, Japanese, and Arabic.
+
+### Localization Screenshots
+
+The interface text changes dynamically using FXML, ResourceBundle, and properties files.
+
+![Localization GUI](localization_gui.png)
+
+Arabic was added as the fifth supported language:
+
+![Arabic Localization and Conversion](localization_arabic_conversion.png)
+
+### Temperature Unit Selection
+
+I added an output unit selector to the JavaFX interface. The input is in Celsius and the user can convert it to Fahrenheit, Kelvin, or Celsius.
+
+Example of Fahrenheit conversion:
+
+![Fahrenheit Conversion](Convert_F.png)
+
+Example with Japanese localization:
+
+![Japanese Conversion](Convert_F_jepanesss.png)
+
+### Updated Unit Tests
+
+I kept all of my previous tests and added a new test for Celsius to Kelvin conversion. The project now has 8 tests in total: 5 TemperatureConverter tests, 2 DBConnection tests, and 1 TempRecordDAO test.
+
+All 8 tests pass successfully with Maven.
+
+```text
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
+```
