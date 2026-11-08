@@ -1,5 +1,6 @@
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
@@ -8,6 +9,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -20,12 +23,17 @@ public class TemperatureController {
     private TextField inputField;
 
     @FXML
-    private ComboBox<String> unitBox;
+    private ComboBox<LocalizedUnitDAO.LocalizedUnit> unitBox;
 
     @FXML
     private Label resultLabel;
 
+    @FXML
+    private Button convertButton;
+
     private ResourceBundle messages;
+
+    private List<LocalizedUnitDAO.LocalizedUnit> temperatureUnits;
 
     @FXML
     public void initialize() {
@@ -44,13 +52,11 @@ public class TemperatureController {
 
         languageBox.setValue(getLanguageName(Locale.getDefault()));
 
-        unitBox.getItems().addAll(
-                "Fahrenheit",
-                "Kelvin",
-                "Celsius"
+        loadTemperatureUnits(Locale.getDefault());
+        unitBox.valueProperty().addListener(
+                (observable, oldUnit, newUnit) -> updateConversionButtonLabel()
         );
-
-        unitBox.setValue("Fahrenheit");
+        updateConversionButtonLabel();
     }
 
     @FXML
@@ -58,36 +64,20 @@ public class TemperatureController {
         try {
             double celsius = Double.parseDouble(inputField.getText());
 
-            TemperatureConverter converter = new TemperatureConverter();
-
-            String selectedUnit = unitBox.getValue();
-            double result;
-            String resultUnit;
-
-            switch (selectedUnit) {
-                case "Kelvin":
-                    result = converter.celsiusToKelvin(celsius);
-                    resultUnit = "Kelvin";
-                    break;
-
-                case "Celsius":
-                    result = celsius;
-                    resultUnit = messages.getString("celsius");
-                    break;
-
-                default:
-                    result = converter.celsiusToFahrenheit(celsius);
-                    resultUnit = messages.getString("fahrenheit");
-                    break;
+            LocalizedUnitDAO.LocalizedUnit selectedUnit = unitBox.getValue();
+            if (selectedUnit == null) {
+                selectedUnit = findUnitByCode("fahrenheit");
             }
+            double result = convertCelsius(celsius, selectedUnit.code());
 
             TempRecordDAO.saveRecord(celsius, result);
 
+            String celsiusName = findUnitByCode("celsius").name();
             resultLabel.setText(
-                    celsius + " " + messages.getString("celsius")
+                    celsius + " " + celsiusName
                             + " = "
                             + result + " "
-                            + resultUnit
+                            + selectedUnit.name()
             );
 
         } catch (NumberFormatException e) {
@@ -121,6 +111,11 @@ public class TemperatureController {
             );
 
             Parent root = loader.load();
+            root.setNodeOrientation(
+                    locale.getLanguage().equals("ar")
+                            ? javafx.geometry.NodeOrientation.RIGHT_TO_LEFT
+                            : javafx.geometry.NodeOrientation.LEFT_TO_RIGHT
+            );
 
             Stage stage =
                     (Stage) languageBox.getScene().getWindow();
@@ -132,6 +127,57 @@ public class TemperatureController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void loadTemperatureUnits(Locale locale) {
+        try {
+            temperatureUnits = LocalizedUnitDAO.findTemperatureUnits(locale);
+            unitBox.getItems().setAll(temperatureUnits);
+            unitBox.setValue(findUnitByCode("fahrenheit"));
+        } catch (SQLException e) {
+            throw new IllegalStateException(
+                    "Could not load localized temperature units for " + locale, e
+            );
+        }
+    }
+
+    @FXML
+    private void updateConversionButtonLabel() {
+        LocalizedUnitDAO.LocalizedUnit selectedUnit = unitBox.getValue();
+        if (selectedUnit != null) {
+            convertButton.setText(conversionButtonLabel(messages, selectedUnit));
+        }
+    }
+
+    static String conversionButtonLabel(
+            ResourceBundle messages,
+            LocalizedUnitDAO.LocalizedUnit selectedUnit
+    ) {
+        return java.text.MessageFormat.format(
+                messages.getString("convertTo"),
+                selectedUnit.name()
+        );
+    }
+
+    static double convertCelsius(double celsius, String unitCode) {
+        TemperatureConverter converter = new TemperatureConverter();
+        return switch (unitCode) {
+            case "celsius" -> celsius;
+            case "fahrenheit" -> converter.celsiusToFahrenheit(celsius);
+            case "kelvin" -> converter.celsiusToKelvin(celsius);
+            default -> throw new IllegalArgumentException(
+                    "Unsupported temperature unit: " + unitCode
+            );
+        };
+    }
+
+    private LocalizedUnitDAO.LocalizedUnit findUnitByCode(String code) {
+        return temperatureUnits.stream()
+                .filter(unit -> unit.code().equals(code))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "Temperature unit is not available: " + code
+                ));
     }
 
     private String getLanguageName(Locale locale) {

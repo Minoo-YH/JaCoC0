@@ -1,5 +1,6 @@
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -25,6 +26,11 @@ public class TemperatureApp extends Application {
         );
 
         Parent root = loader.load();
+        root.setNodeOrientation(
+                locale.getLanguage().equals("ar")
+                        ? NodeOrientation.RIGHT_TO_LEFT
+                        : NodeOrientation.LEFT_TO_RIGHT
+        );
 
         Scene scene = new Scene(root);
 
