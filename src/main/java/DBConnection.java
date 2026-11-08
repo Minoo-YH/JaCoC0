@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -5,57 +8,65 @@ import java.sql.Statement;
 
 public class DBConnection {
 
-    private static final String URL = "jdbc:sqlite:temperature.db";
+    private static final String DATABASE_PATH_PROPERTY = "temperature.db.path";
+    private static final String DEFAULT_DATABASE_PATH = "temperature.db";
+    private static final String INITIALIZATION_SCRIPT = "/init.sql";
 
     public static Connection connect() throws SQLException {
-        Connection connection = DriverManager.getConnection(URL);
+        Connection connection = DriverManager.getConnection(
+                "jdbc:sqlite:" + System.getProperty(
+                        DATABASE_PATH_PROPERTY,
+                        DEFAULT_DATABASE_PATH
+                )
+        );
 
         try (Statement statement = connection.createStatement()) {
             statement.execute("PRAGMA foreign_keys = ON");
+        } catch (SQLException e) {
+            try {
+                connection.close();
+            } catch (SQLException closeException) {
+                e.addSuppressed(closeException);
+            }
+            throw e;
         }
 
         return connection;
     }
 
     public static void initializeDatabase() {
-        String createUnits = """
-            CREATE TABLE IF NOT EXISTS temperature_unit (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL UNIQUE,
-                symbol TEXT NOT NULL
-            )
-            """;
+        try {
+            String script;
+            try (InputStream input = DBConnection.class.getResourceAsStream(INITIALIZATION_SCRIPT)) {
+                if (input == null) {
+                    throw new SQLException("Database initialization resource not found: " + INITIALIZATION_SCRIPT);
+                }
+                script = new String(input.readAllBytes(), StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                throw new SQLException("Could not read database initialization resource: " + INITIALIZATION_SCRIPT, e);
+            }
 
-        String createRecords = """
-            CREATE TABLE IF NOT EXISTS temperature_record (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                input_value REAL NOT NULL,
-                result_value REAL NOT NULL,
-                unit_id INTEGER NOT NULL,
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (unit_id) REFERENCES temperature_unit(id)
-            )
-            """;
-
-        String insertUnits = """
-            INSERT OR IGNORE INTO temperature_unit (name, symbol)
-            VALUES
-                ('Celsius', 'C'),
-                ('Fahrenheit', 'F'),
-                ('Kelvin', 'K')
-            """;
-
-        try (Connection connection = connect();
-             Statement statement = connection.createStatement()) {
-
-            statement.execute(createUnits);
-            statement.execute(createRecords);
-            statement.executeUpdate(insertUnits);
-
-            System.out.println("Database initialized successfully.");
-
+            try (Connection connection = connect();
+                 Statement statement = connection.createStatement()) {
+                connection.setAutoCommit(false);
+                try {
+                    for (String sql : script.split(";")) {
+                        if (!sql.isBlank()) {
+                            statement.execute(sql);
+                        }
+                    }
+                    connection.commit();
+                } catch (SQLException | RuntimeException e) {
+                    try {
+                        connection.rollback();
+                    } catch (SQLException rollbackException) {
+                        e.addSuppressed(rollbackException);
+                    }
+                    throw e;
+                }
+            }
         } catch (SQLException e) {
-            System.err.println("Database error: " + e.getMessage());
+            throw new IllegalStateException("Failed to initialize database using " + INITIALIZATION_SCRIPT, e);
         }
     }
 
