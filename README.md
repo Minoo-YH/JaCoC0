@@ -364,21 +364,18 @@ Static GUI labels are localized using ResourceBundle properties. Unit names and 
 
 #### English
 
-![English JavaFX GUI](englishtask6.png)
+![English JavaFX GUI](screenshots/english.png)
 
 #### Japanese
 
-![Japanese JavaFX GUI](jepanestask6.png)
+![Japanese JavaFX GUI](screenshots/japanese.png)
 
 #### Arabic (RTL)
 
-![Arabic JavaFX GUI with right-to-left layout](arabictask6.png)
+![Arabic JavaFX GUI with right-to-left layout](screenshots/arabic.png)
 
 ### Other Assignment 6 Screenshots
 
-- Successful Jenkins Pipeline — Pending  
-  ![Successful Jenkins Pipeline — Pending](screenshots/assignment6/jenkins-pipeline.png)
-- JaCoCo Coverage Report — Pending  
-  ![JaCoCo Coverage Report — Pending](screenshots/assignment6/jacoco-coverage.png)
-- Minikube `kubectl get pods` output — Pending  
-  ![Minikube kubectl get pods output — Pending](screenshots/assignment6/minikube-kubectl-get-pods.png)
+- Successful Jenkins Pipeline — Pending.
+- JaCoCo Coverage Report — Pending.
+- Minikube `kubectl get pods` output — Pending.
