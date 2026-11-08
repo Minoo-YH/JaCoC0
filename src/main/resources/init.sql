@@ -22,6 +22,16 @@ CREATE TABLE IF NOT EXISTS measurement_unit (
     UNIQUE (domain, code)
 );
 
+CREATE TABLE IF NOT EXISTS conversion_metadata (
+    record_id INTEGER PRIMARY KEY,
+    source_unit_id INTEGER NOT NULL,
+    target_unit_id INTEGER NOT NULL,
+    language TEXT NOT NULL CHECK (language IN ('en', 'fi', 'sv', 'ja', 'ar')),
+    FOREIGN KEY (record_id) REFERENCES temperature_record(id),
+    FOREIGN KEY (source_unit_id) REFERENCES measurement_unit(id),
+    FOREIGN KEY (target_unit_id) REFERENCES measurement_unit(id)
+);
+
 CREATE TABLE IF NOT EXISTS temperature_unit_registry (
     temperature_unit_id INTEGER PRIMARY KEY,
     measurement_unit_id INTEGER NOT NULL UNIQUE,
