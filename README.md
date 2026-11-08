@@ -303,64 +303,15 @@ The Jenkins pipeline successfully built and tested the project, generated JaCoCo
 
 ## In-class Assignment 6 — Database Localization
 
-### Purpose
+I added SQLite translations for unit names and descriptions in English, Finnish, Swedish, Japanese, and Arabic. The database uses a translation-table design: `measurement_unit` keeps each unit's stable ID, and `unit_translation` stores its text for each language. If a translation is missing, the DAO uses English.
 
-The purpose of this assignment is to extend the Temperature Converter's SQLite database so that measurement units can have localized names and descriptions. The database design also includes unit and conversion-record tables for temperature, speed, distance, and time. The schema and seed data are defined in `src/main/resources/init.sql`, and the production database has been migrated and verified with its existing 22 temperature conversion records preserved.
+The JavaFX labels and buttons come from ResourceBundle property files; unit names come from SQLite. Arabic uses a right-to-left layout. New conversions save their source, target, and language, and the GUI displays the five most recent conversions. Older records are marked as legacy, without guessing their missing target or language.
 
-### Translation Table Approach
+The database initializer is repeatable. JUnit tests use temporary databases; the latest `mvn clean verify` passed 23 tests. Database integrity and preservation of existing records were verified. JaCoCo coverage verification for this update is **Pending**.
 
-This project uses one Translation Table approach for unit localization. Instead of storing a separate translated column or copy of each unit for every language, each unit has one canonical entry and its localized labels are stored as rows in `unit_translation`.
+Docker verification for this update is **Pending**. A Jenkins run for these changes is **Pending**. Kubernetes/Minikube deployment verification is also **Pending**.
 
-The `measurement_unit` table is the shared unit registry. It contains an integer `id`, a `domain` (`temperature`, `speed`, `distance`, or `time`), and a stable `code`. The existing `temperature_unit` table is preserved and is linked to the shared registry through `temperature_unit_registry`. The speed, distance, and time unit tables use their measurement-unit IDs as foreign keys.
-
-The shared `unit_translation` table contains:
-
-- `unit_id`, a foreign key to `measurement_unit(id)`.
-- `lang`, limited by the schema to `en`, `fi`, `sv`, `ja`, or `ar`.
-- `name` and `description`, stored as UTF-8 text.
-- A composite primary key `(unit_id, lang)`, so each unit has at most one translation per supported language.
-
-The SQL seed data contains localized names and descriptions for the 12 temperature, speed, distance, and time units. The initialization script uses `CREATE TABLE IF NOT EXISTS` and `INSERT OR IGNORE` so repeated initialization does not recreate existing tables or duplicate seeded rows.
-
-### Why Translation Table?
-
-The Translation Table approach keeps localized text separate from stable unit identities and makes adding a language a data change rather than a schema change. It avoids adding one column per language (Field localization), duplicating otherwise identical unit rows by language (Row localization), or creating separate unit tables for each language (Table localization). A shared table also provides the same localization structure for every measurement domain.
-
-### JavaFX and Localization
-
-The JavaFX interface uses the existing `MessagesBundle_*.properties` ResourceBundles for static interface text such as titles, prompts, buttons, and labels. The available bundles are English, Finnish, Swedish, Japanese, and Arabic. The language selector reloads the interface using the selected bundle.
-
-Database localization is a separate layer: `unit_translation` stores the localized names and descriptions for measurement units. The localized-unit DAO reads those values for the active language, with English fallback when a translation is missing. The output-unit selector uses stable unit codes for conversion, while displaying the localized database names. Arabic uses right-to-left node orientation; other supported languages use left-to-right orientation.
-
-### Database Migration and English Fallback
-
-`src/main/resources/init.sql` defines the additive schema and seed data. `DBConnection.initializeDatabase()` loads that resource, enables foreign keys for its connection, and applies the statements transactionally. The database path defaults to `temperature.db` and can be overridden with the `temperature.db.path` system property. Initialization failures are surfaced as an unchecked `IllegalStateException` with the underlying SQL exception as its cause.
-
-The production database migration was run after a verified SQLite backup. Verification confirmed 12 measurement units and 60 translations (12 per language), no duplicate unit keys or translations, no foreign-key violations, and a successful SQLite integrity check. Re-running initialization did not change database rows. The localized-unit DAO uses the requested language and falls back to English when a unit translation is unavailable.
-
-### Tests, Coverage, and Database Integrity
-
-JUnit 5 tests cover temperature conversion, database connection and initialization, record saving, localized unit queries, English fallback, and localized conversion-button labels. Database tests use temporary databases so they do not modify the production `temperature.db`. The latest `mvn clean verify` run completed successfully with 15 tests passing, 0 failures, 0 errors, and 0 skipped.
-
-JaCoCo is configured in Maven to generate a report under `target/site/jacoco/`. The latest test run generated this report; coverage is not a gate for the database migration.
-
-The schema tests check repeatable initialization, translation coverage, UTF-8 sample translations, foreign-key integrity, and preservation of existing temperature records in an isolated test database. The production migration was separately verified to preserve all 22 existing temperature records.
-
-### Docker
-
-The existing Dockerfile builds and starts the JavaFX application with Maven. **Pending:** Docker has not been revalidated with the new database schema, and GUI display still depends on a suitable display environment. The Docker configuration has not been changed for this database-localization step.
-
-### Jenkins
-
-The existing Jenkinsfile defines Maven build and test stages, JaCoCo publishing, and Docker build and push stages. **Pending:** a Jenkins run validating the database-localization changes has not been verified. The Jenkinsfile has not been changed for this step.
-
-### Kubernetes
-
-The existing `tempconverter.yaml` defines a one-replica Deployment. Its container command currently prints a deployment message and sleeps; it does not start the JavaFX application. **Pending:** running the application as a Kubernetes workload and validating it with Minikube are not implemented or verified. The Kubernetes configuration has not been changed for this step.
-
-### Assignment 6 — Localization Screenshots
-
-Static GUI labels are localized using ResourceBundle properties. Unit names and descriptions are localized using SQLite translation tables. Five languages are supported: English, Finnish, Swedish, Japanese, and Arabic. Arabic uses right-to-left layout, and missing unit translations fall back to English.
+### Screenshots
 
 #### English
 
@@ -372,10 +323,8 @@ Static GUI labels are localized using ResourceBundle properties. Unit names and 
 
 #### Arabic (RTL)
 
-![Arabic JavaFX GUI with right-to-left layout](screenshots/arabic.png)
+![Arabic JavaFX GUI](screenshots/arabic.png)
 
-### Other Assignment 6 Screenshots
+#### Recent Conversion History
 
-- Successful Jenkins Pipeline — Pending.
-- JaCoCo Coverage Report — Pending.
-- Minikube `kubectl get pods` output — Pending.
+![Recent conversions](screenshots/history.png)
